@@ -1,57 +1,52 @@
+using System;
 using UnityEngine;
-
-public class Scripts : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
-    Rigidbody2D rb2d; //private variable
+    public float Speed;
+    float move;
 
-    Vector2 moveInput; //for walk with addforce
+    public float JumpForce;
+    public bool IsJumping;
 
-    //walk left-right
-    float move; //store Input from player
-    [SerializeField] float speed;
+    Rigidbody2D rb2d;
 
-    //Jump
-    [SerializeField] float jumpForce;
-    [SerializeField] bool isJumping;
-
+    Vector2 moveInput; //for walk addforce
     void Start()
     {
-        rb2d = GetComponent<Rigidbody2D>();       
+        rb2d = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
         //walk with addforce
         moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        rb2d.AddForce(moveInput * speed);
-
+        rb2d.AddForce(moveInput * Speed);
         //walk left-right
-        //move = Input.GetAxis("Horizontal");
-        //rb2d.linearVelocity = new Vector2(move * speed, rb2d.linearVelocity.y);
+        move = Input.GetAxis("Horizontal");
+        rb2d.linearVelocity = new Vector2(move * Speed, rb2d.linearVelocity.y);
 
-        //Jump
-        if (Input.GetButtonDown("Jump") && !isJumping)
+        //jump
+        if (Input.GetButtonDown("Jump") && !IsJumping)
         {
-            rb2d.AddForce(new Vector2(rb2d.linearVelocity.x, jumpForce));
-            Debug.Log("Jump!"); //for debugging
-        } 
-    }
+            rb2d.linearVelocity = new Vector2(rb2d.linearVelocity.x, JumpForce);
 
-
-    private void OnCollisionEnter2D(Collider2D other)
-    {
-        if (other.gameObject.CompareTag("Ground"))
-        {
-            isJumping = false;
+            Debug.Log("Jump");
         }
     }
 
-    private void OnCollisionExit2D(Collider2D other)
+    private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.CompareTag("Ground"))
         {
-            isJumping = true;
+            IsJumping = false;
         }
     }
 
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            IsJumping = true;
+        }
+    }
 }
